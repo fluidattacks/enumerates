@@ -1,0 +1,13 @@
+{
+    "extends": [
+        "eslint:all",
+        "plugin:@typescript-eslint/all",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    ],
+    "parser":  "@typescript-eslint/parser",
+    "parserOptions": {
+        "project": true
+    },
+    "plugins": ["@typescript-eslint"],
+    "root": true
+}
