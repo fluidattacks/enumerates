@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": "../",
+    "forceConsistentCasingInFileNames": true,
+    "module": "ES2022",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "./dist",
+    "strict": true,
+    "target": "ES2017"
+  }
+}
