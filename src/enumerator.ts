@@ -35,7 +35,7 @@ function getToEInputs(): HTMLAttribute[][] {
   return toeInputs;
 }
 
-fetch("http://127.0.0.1:5000/", {
+void fetch("http://127.0.0.1:5000/", {
   method: "post",
   body: JSON.stringify(getToEInputs()),
   headers: { "Content-Type": "application/json" },
