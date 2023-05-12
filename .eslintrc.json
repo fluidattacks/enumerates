@@ -3,14 +3,18 @@
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:fp-ts/recommended",
+        "plugin:fp-ts/recommended-requiring-type-checking",
         "plugin:prettier/recommended"
     ],
+    "ignorePatterns": ["src/dist/*.js"],
     "parser":  "@typescript-eslint/parser",
     "parserOptions": {
         "project": true
     },
     "plugins": [
         "@typescript-eslint",
+        "fp-ts",
         "prettier"
     ],
     "root": true,
