@@ -1,0 +1,9 @@
+steps:
+  - label: lint
+    if: build.branch != "main"
+    command:
+      - echo --- Load environment
+      - direnv allow
+      - eval "$(direnv export bash)"
+      - echo +++ Run Linter
+      - eslint src
