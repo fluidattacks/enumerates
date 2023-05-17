@@ -15,9 +15,22 @@
         "type": "github"
       }
     },
+    "pulumi_3_67_0": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-HQAStlQfRDYnvqXbHgfbu0vrit088D0WTxuYo9M8JRI=",
+        "type": "tarball",
+        "url": "https://github.com/pulumi/pulumi/releases/download/v3.67.0/pulumi-v3.67.0-darwin-arm64.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://github.com/pulumi/pulumi/releases/download/v3.67.0/pulumi-v3.67.0-darwin-arm64.tar.gz"
+      }
+    },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "pulumi_3_67_0": "pulumi_3_67_0"
       }
     }
   },

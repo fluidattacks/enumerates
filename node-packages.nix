@@ -378,13 +378,13 @@
         sha512 = "BZME50QkT556v+LvmTXPT8ssB2xxNkp9+msB5xYFEnUnWcdGAx5yUysQw70RJCb+U0GbkJSbxtlgMJgOQf/now==";
       };
     };
-    "@pulumi/pulumi-3.65.1" = {
+    "@pulumi/pulumi-3.67.0" = {
       name = "_at_pulumi_slash_pulumi";
       packageName = "@pulumi/pulumi";
-      version = "3.65.1";
+      version = "3.67.0";
       src = fetchurl {
-        url = "https://registry.npmjs.org/@pulumi/pulumi/-/pulumi-3.65.1.tgz";
-        sha512 = "XhyBtrA8dvgpiMt7jTnhIuRKIVQ0e/P89WRcsPdkYpnJVM3dc7YdMrFPZ4ceWrDdbNuNgq/fNOCsnxjo5BM/WA==";
+        url = "https://registry.npmjs.org/@pulumi/pulumi/-/pulumi-3.67.0.tgz";
+        sha512 = "GOIm/Nc4gm0pSlSY39p+R0MVnidUfdC10JwBLg3SSmZqzjxwtPTOUUnpd2wYLFrGW+MOo9FDlWOXTFF50HEMqA==";
       };
     };
     "@pulumi/query-0.3.0" = {
@@ -1152,6 +1152,15 @@
         sha512 = "78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==";
       };
     };
+    "find-up-6.3.0" = {
+      name = "find-up";
+      packageName = "find-up";
+      version = "6.3.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/find-up/-/find-up-6.3.0.tgz";
+        sha512 = "v2ZsoEuVHYy8ZIlYqwPe/39Cy+cFDzp4dXPaxNvkEuouymu+2Jbz0PxpKarJHYJTmv2HWT3O382qY8l4jMWthw==";
+      };
+    };
     "flat-cache-3.0.4" = {
       name = "flat-cache";
       packageName = "flat-cache";
@@ -1809,6 +1818,15 @@
         sha512 = "iPZK6eYjbxRu3uB4/WZ3EsEIMJFMqAoopl3R+zuq0UjcAm/MO6KCweDgPfP3elTztoKP3KtnVHxTn2NHBSDVUw==";
       };
     };
+    "locate-path-7.2.0" = {
+      name = "locate-path";
+      packageName = "locate-path";
+      version = "7.2.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/locate-path/-/locate-path-7.2.0.tgz";
+        sha512 = "gvVijfZvn7R+2qyPX8mAuKcFGDf6Nc61GdvGafQsHL0sBIxfKzA+usWn4GFC/bk+QdwPUD4kWFJLhElipq+0VA==";
+      };
+    };
     "lodash.camelcase-4.3.0" = {
       name = "lodash.camelcase";
       packageName = "lodash.camelcase";
@@ -2070,6 +2088,15 @@
         sha512 = "TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==";
       };
     };
+    "p-limit-4.0.0" = {
+      name = "p-limit";
+      packageName = "p-limit";
+      version = "4.0.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/p-limit/-/p-limit-4.0.0.tgz";
+        sha512 = "5b0R4txpzjPWVw/cXXUResoD4hb6U/x9BH08L7nw+GN1sezDzPdxeRvpc9c433fZhBan/wusjbCsqwqm4EIBIQ==";
+      };
+    };
     "p-locate-5.0.0" = {
       name = "p-locate";
       packageName = "p-locate";
@@ -2077,6 +2104,15 @@
       src = fetchurl {
         url = "https://registry.npmjs.org/p-locate/-/p-locate-5.0.0.tgz";
         sha512 = "LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==";
+      };
+    };
+    "p-locate-6.0.0" = {
+      name = "p-locate";
+      packageName = "p-locate";
+      version = "6.0.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/p-locate/-/p-locate-6.0.0.tgz";
+        sha512 = "wPrq66Llhl7/4AGC6I+cqxT07LhXvWL08LNXz1fENOw0Ap4sRZZ/gZpTTJ5jpurzzzfS2W/Ge9BY3LgLjCShcw==";
       };
     };
     "parent-module-1.0.1" = {
@@ -2095,6 +2131,15 @@
       src = fetchurl {
         url = "https://registry.npmjs.org/path-exists/-/path-exists-4.0.0.tgz";
         sha512 = "ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==";
+      };
+    };
+    "path-exists-5.0.0" = {
+      name = "path-exists";
+      packageName = "path-exists";
+      version = "5.0.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/path-exists/-/path-exists-5.0.0.tgz";
+        sha512 = "RjhtfwJOxzcFmNOi6ltcbcu4Iu+FL3zEj83dk4kAS+fVpTxXLO1b38RvJgT/0QwvV/L3aY9TAnyv0EOqW4GoMQ==";
       };
     };
     "path-is-absolute-1.0.1" = {
@@ -2140,6 +2185,15 @@
       src = fetchurl {
         url = "https://registry.npmjs.org/picomatch/-/picomatch-2.3.1.tgz";
         sha512 = "JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==";
+      };
+    };
+    "pkg-dir-7.0.0" = {
+      name = "pkg-dir";
+      packageName = "pkg-dir";
+      version = "7.0.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/pkg-dir/-/pkg-dir-7.0.0.tgz";
+        sha512 = "Ie9z/WINcxxLp27BKOCHGde4ITq9UklYKDzVo1nhk5sqGEXU3FpkwP5GM2voTGJkGd9B3Otl+Q4uwSOeSUtOBA==";
       };
     };
     "prelude-ls-1.2.1" = {
@@ -2880,6 +2934,15 @@
         sha512 = "rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==";
       };
     };
+    "yocto-queue-1.0.0" = {
+      name = "yocto-queue";
+      packageName = "yocto-queue";
+      version = "1.0.0";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/yocto-queue/-/yocto-queue-1.0.0.tgz";
+        sha512 = "9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==";
+      };
+    };
   };
   args = {
     name = "enumerator";
@@ -2947,7 +3010,7 @@
       sources."@pulumi/aws-apigateway-1.0.1"
       sources."@pulumi/awsx-1.0.2"
       sources."@pulumi/docker-3.6.1"
-      (sources."@pulumi/pulumi-3.65.1"
+      (sources."@pulumi/pulumi-3.67.0"
         // {
           dependencies = [
             sources."semver-6.3.0"
@@ -3190,6 +3253,17 @@
       sources."path-parse-1.0.7"
       sources."path-type-4.0.0"
       sources."picomatch-2.3.1"
+      (sources."pkg-dir-7.0.0"
+        // {
+          dependencies = [
+            sources."find-up-6.3.0"
+            sources."locate-path-7.2.0"
+            sources."p-limit-4.0.0"
+            sources."p-locate-6.0.0"
+            sources."path-exists-5.0.0"
+            sources."yocto-queue-1.0.0"
+          ];
+        })
       sources."prelude-ls-1.2.1"
       sources."prettier-2.8.8"
       sources."prettier-linter-helpers-1.0.0"

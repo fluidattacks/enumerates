@@ -10,7 +10,7 @@
 		"@pulumi/aws": "5.39.0",
 		"@pulumi/aws-apigateway": "1.0.1",
 		"@pulumi/awsx": "1.0.2",
-		"@pulumi/pulumi": "3.65.1",
+		"@pulumi/pulumi": "3.67.0",
 		"eslint": "8.40.0",
 		"eslint-config-prettier": "8.8.0",
 		"eslint-plugin-fp-ts": "0.3.2",
