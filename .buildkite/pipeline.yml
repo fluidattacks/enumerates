@@ -6,4 +6,5 @@ steps:
       - direnv allow
       - eval "$(direnv export bash)"
       - echo +++ Run Linter
-      - eslint src
+      - eslint .
+      - echo --- Success

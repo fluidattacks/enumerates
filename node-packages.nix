@@ -405,6 +405,15 @@
         sha512 = "kCZuFXKLV3y8NjSoaD5+qKTpRWvPz3uh3W/u1uwlw3Mg+MtaStg1NWgjAwUXo/VJDb6n6KF1ljykFNlNwEJ53Q==";
       };
     };
+    "@types/crypto-js-4.1.1" = {
+      name = "_at_types_slash_crypto-js";
+      packageName = "@types/crypto-js";
+      version = "4.1.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/@types/crypto-js/-/crypto-js-4.1.1.tgz";
+        sha512 = "BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==";
+      };
+    };
     "@types/json-schema-7.0.11" = {
       name = "_at_types_slash_json-schema";
       packageName = "@types/json-schema";
@@ -790,6 +799,15 @@
       src = fetchurl {
         url = "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.3.tgz";
         sha512 = "iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==";
+      };
+    };
+    "crypto-js-4.1.1" = {
+      name = "crypto-js";
+      packageName = "crypto-js";
+      version = "4.1.1";
+      src = fetchurl {
+        url = "https://registry.npmjs.org/crypto-js/-/crypto-js-4.1.1.tgz";
+        sha512 = "o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==";
       };
     };
     "debug-4.3.4" = {
@@ -3019,6 +3037,7 @@
         })
       sources."@pulumi/query-0.3.0"
       sources."@types/aws-lambda-8.10.115"
+      sources."@types/crypto-js-4.1.1"
       sources."@types/json-schema-7.0.11"
       sources."@types/long-4.0.2"
       sources."@types/node-18.16.7"
@@ -3081,6 +3100,7 @@
       sources."color-name-1.1.4"
       sources."concat-map-0.0.1"
       sources."cross-spawn-7.0.3"
+      sources."crypto-js-4.1.1"
       sources."debug-4.3.4"
       sources."debuglog-1.0.1"
       sources."deep-is-0.1.4"

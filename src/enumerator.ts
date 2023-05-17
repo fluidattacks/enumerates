@@ -7,11 +7,11 @@ function parseHTMLAttributes(
   element: HTMLInputElement | HTMLTextAreaElement
 ): HTMLAttribute[] {
   const parsedAttributes: HTMLAttribute[] = [
-    { name: "tagName", value: element.tagName },
+    { name: "tagname", value: element.tagName },
   ];
   for (let i = 0; i < element.attributes.length; i++) {
     const attr = element.attributes[i];
-    parsedAttributes.push({ name: attr.name, value: attr.value });
+    parsedAttributes.push({ name: attr.name.toLowerCase(), value: attr.value });
   }
   return parsedAttributes;
 }
@@ -37,6 +37,10 @@ function getToEInputs(): HTMLAttribute[][] {
 
 void fetch("http://127.0.0.1:5000/", {
   method: "post",
-  body: JSON.stringify(getToEInputs()),
+  body: JSON.stringify({
+    host: window.location.hostname,
+    inputs: getToEInputs(),
+    path: window.location.pathname,
+  }),
   headers: { "Content-Type": "application/json" },
 });
