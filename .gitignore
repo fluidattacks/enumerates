@@ -1,4 +1,5 @@
 .direnv/
 dist/
 node_modules/
+node_modules
 result/
