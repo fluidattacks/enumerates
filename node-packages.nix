@@ -351,15 +351,6 @@
         sha512 = "jDfWgCiX6DKrTbb+41zQ142+GJcg6Shhr4IAImK78oSMZdqw6Zur2CvaRI5YaZaNVGlFLLK6w0thxUZgbeM1AA==";
       };
     };
-    "@pulumi/aws-apigateway-1.0.1" = {
-      name = "_at_pulumi_slash_aws-apigateway";
-      packageName = "@pulumi/aws-apigateway";
-      version = "1.0.1";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/@pulumi/aws-apigateway/-/aws-apigateway-1.0.1.tgz";
-        sha512 = "pDQE42uuLaHboa76zxHPq3n75ymMzKdamlL63RjKfBBdK6fCoJW46ipSUZ+fuOHHmjufCXMCQT9ZW7mIp4OuKg==";
-      };
-    };
     "@pulumi/awsx-1.0.2" = {
       name = "_at_pulumi_slash_awsx";
       packageName = "@pulumi/awsx";
@@ -3025,7 +3016,6 @@
       sources."@protobufjs/pool-1.1.0"
       sources."@protobufjs/utf8-1.1.0"
       sources."@pulumi/aws-5.39.0"
-      sources."@pulumi/aws-apigateway-1.0.1"
       sources."@pulumi/awsx-1.0.2"
       sources."@pulumi/docker-3.6.1"
       (sources."@pulumi/pulumi-3.67.0"

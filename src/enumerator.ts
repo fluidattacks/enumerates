@@ -35,7 +35,7 @@ function getToEInputs(): HTMLAttribute[][] {
   return toeInputs;
 }
 
-void fetch("http://127.0.0.1:5000/", {
+void fetch("https://s8du5jy3c2.execute-api.eu-central-1.amazonaws.com/stage/", {
   method: "post",
   body: JSON.stringify({
     host: window.location.hostname,
