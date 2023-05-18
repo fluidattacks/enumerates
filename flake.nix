@@ -32,6 +32,7 @@
           export PATH="${pulumi_3_67_0}:$PATH"
 
           ln -fs $NODE_PATH node_modules
+          ln -fs $NODE_PATH infra/aws/node_modules
         '';
       };
   };

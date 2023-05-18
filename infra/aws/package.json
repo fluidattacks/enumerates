@@ -5,8 +5,8 @@
 	},
 	"dependencies": {
 		"@pulumi/aws": "5.39.0",
-		"@pulumi/aws-apigateway": "1.0.1",
 		"@pulumi/awsx": "1.0.2",
-		"@pulumi/pulumi": "3.67.0"
+		"@pulumi/pulumi": "3.67.0",
+		"crypto-js": "4.1.1"
 	}
 }
