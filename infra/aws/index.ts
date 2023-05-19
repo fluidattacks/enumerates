@@ -130,7 +130,6 @@ const processInputs = (
 };
 
 const lambdaFn = new aws.lambda.CallbackFunction("enumerator_fn", {
-  memorySize: 512,
   callbackFactory: () => {
     let dynamoClient = new aws.sdk.DynamoDB.DocumentClient();
 
