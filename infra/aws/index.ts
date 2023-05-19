@@ -82,11 +82,16 @@ const processInputs = (
   host: string,
   path: string
 ): InputsToWrite => {
-  const existingIdentifiers: string[] = existingInputs.map(
-      (input: Record<string, string>): string =>
-        input["rk"].split("#").slice(-1)[0]
+  const existingIdentifiersInDb: string[] = existingInputs.map(
+      (input: Record<string, string>): string => {
+        const splitRk = input["rk"].split("#");
+
+        return input["duplicate_index"] === undefined ? splitRk[3] : splitRk[5];
+      }
     ),
+    duplicateIdentifiers: Record<string, number> = {},
     writeRequests: DocumentClient.WriteRequests = [];
+
   let newInputs = 0;
 
   inputs.forEach((input: HTMLAttribute[]) => {
@@ -97,23 +102,42 @@ const processInputs = (
     });
 
     const identifier: string =
-        item["name"] ||
-        item["id"] ||
-        item["placeholder"] ||
-        CryptoJS.SHA256(JSON.stringify(input)).toString(CryptoJS.enc.Hex),
-      inputExists: boolean = existingIdentifiers.indexOf(identifier) > -1;
+      item["id"] || item["name"] || item["placeholder"] || "undefined";
+
+    if (duplicateIdentifiers[identifier] === undefined) {
+      duplicateIdentifiers[identifier] = 0;
+    } else {
+      item["duplicate_index"] = duplicateIdentifiers[identifier].toString();
+      duplicateIdentifiers[identifier]++;
+    }
+
+    const hash = CryptoJS.SHA256(JSON.stringify(item)).toString(
+        CryptoJS.enc.Hex
+      ),
+      inputExistsInDb: boolean =
+        item["duplicate_index"] === undefined
+          ? existingIdentifiersInDb.indexOf(identifier) > -1
+          : existingIdentifiersInDb.indexOf(hash) > -1;
 
     item["hk"] = `HOST#${host}#PATH#${path}`;
-    item["rk"] = `TAG#${item["tagname"]}#IDENTIFIER#${identifier}`;
+    item["rk"] = `TAG#${item["tagname"]}#IDENTIFIER#${identifier}#HASH#${hash}`;
     item["first_seen"] = item["last_seen"] = new Date().toISOString();
 
-    if (inputExists) {
+    if (inputExistsInDb) {
       writeRequests.push({
         PutRequest: {
-          Item: {
-            ...existingInputs[existingIdentifiers.indexOf(identifier)],
-            last_seen: item["last_seen"],
-          },
+          Item:
+            item["duplicate_index"] === undefined
+              ? {
+                  ...existingInputs[
+                    existingIdentifiersInDb.indexOf(identifier)
+                  ],
+                  last_seen: item["last_seen"],
+                }
+              : {
+                  ...existingInputs[existingIdentifiersInDb.indexOf(hash)],
+                  last_seen: item["last_seen"],
+                },
         },
       });
     } else {
