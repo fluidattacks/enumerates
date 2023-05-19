@@ -35,12 +35,17 @@ function getToEInputs(): HTMLAttribute[][] {
   return toeInputs;
 }
 
-void fetch("https://s8du5jy3c2.execute-api.eu-central-1.amazonaws.com/stage/", {
-  method: "post",
-  body: JSON.stringify({
-    host: window.location.hostname,
-    inputs: getToEInputs(),
-    path: window.location.pathname,
-  }),
-  headers: { "Content-Type": "application/json" },
+document.addEventListener("DOMContentLoaded", () => {
+  void fetch(
+    "https://s8du5jy3c2.execute-api.eu-central-1.amazonaws.com/stage/",
+    {
+      method: "post",
+      body: JSON.stringify({
+        host: window.location.hostname,
+        inputs: getToEInputs(),
+        path: window.location.pathname,
+      }),
+      headers: { "Content-Type": "application/json" },
+    }
+  );
 });
