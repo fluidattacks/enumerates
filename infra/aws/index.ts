@@ -18,41 +18,127 @@ interface Payload {
 }
 
 interface LambdaResponse {
+  headers: Record<string, string>;
   statusCode: number;
-  headers?: Record<string, string>;
+  body?: string;
+}
+
+interface InputsToWrite {
+  inputs: DocumentClient.WriteRequests;
+  newInputs: number;
 }
 
 const dynamoTable: Table = new aws.dynamodb.Table("toe_enumerator", {
-    attributes: [
-      {
-        name: "hk",
-        type: "S",
-      },
-      {
-        name: "rk",
-        type: "S",
-      },
-    ],
-    billingMode: "PROVISIONED",
-    globalSecondaryIndexes: [
-      {
-        hashKey: "hk",
-        name: "gsi-1",
-        projectionType: "ALL",
-        rangeKey: "rk",
-        readCapacity: 10,
-        writeCapacity: 10,
-      },
-    ],
-    hashKey: "hk",
-    rangeKey: "rk",
-    readCapacity: 20,
-    writeCapacity: 20,
-  }),
-  // A Lambda function to invoke
-  lambdaFn = new aws.lambda.CallbackFunction("enumerator_fn", {
-    callback: async (event: APIGatewayProxyEvent) => {
-      let response: LambdaResponse;
+  attributes: [
+    {
+      name: "hk",
+      type: "S",
+    },
+    {
+      name: "rk",
+      type: "S",
+    },
+  ],
+  billingMode: "PROVISIONED",
+  globalSecondaryIndexes: [
+    {
+      hashKey: "hk",
+      name: "gsi-1",
+      projectionType: "ALL",
+      rangeKey: "rk",
+      readCapacity: 10,
+      writeCapacity: 10,
+    },
+  ],
+  hashKey: "hk",
+  rangeKey: "rk",
+  readCapacity: 20,
+  writeCapacity: 20,
+});
+
+const fetchExistingInputs = async (
+  dynamoClient: DocumentClient,
+  host: string,
+  path: string
+): Promise<Record<string, string>[]> => {
+  const hk = `HOST#${host}#PATH#${path}`;
+
+  const response = await dynamoClient
+    .query({
+      TableName: dynamoTable.name.get(),
+      IndexName: "gsi-1",
+      KeyConditionExpression: "hk = :hk and begins_with(rk, :rk)",
+      ExpressionAttributeValues: { ":hk": hk, ":rk": "TAG" },
+    })
+    .promise()
+    .then((queryResult) => queryResult.$response);
+
+  return response.data && response.data.Items ? response.data.Items : [];
+};
+
+const processInputs = (
+  inputs: HTMLAttribute[][],
+  existingInputs: Record<string, string>[],
+  host: string,
+  path: string
+): InputsToWrite => {
+  const existingIdentifiers: string[] = existingInputs.map(
+      (input: Record<string, string>): string =>
+        input["rk"].split("#").slice(-1)[0]
+    ),
+    writeRequests: DocumentClient.WriteRequests = [];
+  let newInputs = 0;
+
+  inputs.forEach((input: HTMLAttribute[]) => {
+    const item: Record<string, string> = {};
+
+    input.forEach((attribute: HTMLAttribute) => {
+      item[attribute.name] = attribute.value;
+    });
+
+    const identifier: string =
+        item["name"] ||
+        item["id"] ||
+        item["placeholder"] ||
+        CryptoJS.SHA256(JSON.stringify(input)).toString(CryptoJS.enc.Hex),
+      inputExists: boolean = existingIdentifiers.indexOf(identifier) > -1;
+
+    item["hk"] = `HOST#${host}#PATH#${path}`;
+    item["rk"] = `TAG#${item["tagname"]}#IDENTIFIER#${identifier}`;
+    item["first_seen"] = item["last_seen"] = new Date().toISOString();
+
+    if (inputExists) {
+      writeRequests.push({
+        PutRequest: {
+          Item: {
+            ...existingInputs[existingIdentifiers.indexOf(identifier)],
+            last_seen: item["last_seen"],
+          },
+        },
+      });
+    } else {
+      newInputs++;
+      writeRequests.push({
+        PutRequest: {
+          Item: item,
+        },
+      });
+    }
+  });
+
+  return { inputs: writeRequests, newInputs };
+};
+
+const lambdaFn = new aws.lambda.CallbackFunction("enumerator_fn", {
+  memorySize: 512,
+  callbackFactory: () => {
+    let dynamoClient = new aws.sdk.DynamoDB.DocumentClient();
+
+    return async (event: APIGatewayProxyEvent) => {
+      let response: LambdaResponse = {
+        headers: { "Access-Control-Allow-Origin": "*" },
+        statusCode: 200,
+      };
 
       if (event.httpMethod.toLowerCase() === "options") {
         response = {
@@ -72,57 +158,54 @@ const dynamoTable: Table = new aws.dynamodb.Table("toe_enumerator", {
           }
 
           const parsedBody = JSON.parse(body) as Payload,
-            { host, inputs, path } = parsedBody,
-            writeRequests: DocumentClient.WriteRequests = [];
+            { host, inputs, path } = parsedBody;
 
-          inputs.forEach((input: HTMLAttribute[]) => {
-            const item: Record<string, string> = {};
+          if (!dynamoClient) {
+            dynamoClient = new aws.sdk.DynamoDB.DocumentClient();
+          }
 
-            input.forEach((attribute: HTMLAttribute) => {
-              item[attribute.name] = attribute.value;
-            });
+          const existingInputs = await fetchExistingInputs(
+              dynamoClient,
+              host,
+              path
+            ),
+            parsedInputs = processInputs(inputs, existingInputs, host, path);
 
-            const identifier: string =
-              item["name"] ||
-              item["id"] ||
-              item["placeholder"] ||
-              CryptoJS.SHA256(JSON.stringify(input)).toString(CryptoJS.enc.Hex);
-
-            item["hk"] = `HOST#${host}#PATH#${path}`;
-            item["rk"] = `TAG#${item["tagname"]}#IDENTIFIER#${identifier}`;
-            writeRequests.push({
-              PutRequest: {
-                Item: item,
-              },
-            });
-          });
-
-          const dynamoClient = new aws.sdk.DynamoDB.DocumentClient();
-          await dynamoClient
-            .batchWrite({
-              RequestItems: {
-                [dynamoTable.name.get()]: writeRequests,
-              },
-            })
-            .promise();
+          if (parsedInputs.inputs.length > 0) {
+            await dynamoClient
+              .batchWrite({
+                RequestItems: {
+                  [dynamoTable.name.get()]: parsedInputs.inputs,
+                },
+              })
+              .promise()
+              .then(() => {
+                response = {
+                  body: JSON.stringify({
+                    message: `${parsedInputs.newInputs} new inputs were found`,
+                  }),
+                  headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Content-Type": "application/json",
+                  },
+                  statusCode: 200,
+                };
+              });
+          }
         }
-
-        response = {
-          headers: { "Access-Control-Allow-Origin": "*" },
-          statusCode: 200,
-        };
       }
 
       return response;
-    },
-  }),
-  // A REST API to route requests to HTML content and the Lambda function
-  restApi = new awsx.classic.apigateway.API("enumerator_api", {
-    routes: [
-      { path: "/", method: "OPTIONS", eventHandler: lambdaFn },
-      { path: "/", method: "POST", eventHandler: lambdaFn },
-    ],
-  });
+    };
+  },
+});
+
+const restApi = new awsx.classic.apigateway.API("enumerator_api", {
+  routes: [
+    { path: "/", method: "OPTIONS", eventHandler: lambdaFn },
+    { path: "/", method: "POST", eventHandler: lambdaFn },
+  ],
+});
 
 // The URL at which the REST API will be served.
 export const { url } = restApi;
