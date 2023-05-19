@@ -4,7 +4,7 @@ interface HTMLAttribute {
 }
 
 function parseHTMLAttributes(
-  element: HTMLInputElement | HTMLTextAreaElement
+  element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 ): HTMLAttribute[] {
   const parsedAttributes: HTMLAttribute[] = [
     { name: "tagname", value: element.tagName },
@@ -21,17 +21,18 @@ function getToEInputs(): HTMLAttribute[][] {
       document.querySelectorAll("input"),
     textareas: NodeListOf<HTMLTextAreaElement> =
       document.querySelectorAll("textarea"),
+    selects: NodeListOf<HTMLSelectElement> =
+      document.querySelectorAll("select"),
     toeInputs: HTMLAttribute[][] = [];
 
-  inputs.forEach((input: HTMLInputElement) => {
-    const parsedInput = parseHTMLAttributes(input);
-    toeInputs.push(parsedInput);
-  });
+  for (const htmlElements of [inputs, textareas, selects]) {
+    htmlElements.forEach((htmlElement) => {
+      const parsedElement = parseHTMLAttributes(htmlElement);
 
-  textareas.forEach((textarea: HTMLTextAreaElement) => {
-    const parsedTextarea = parseHTMLAttributes(textarea);
-    toeInputs.push(parsedTextarea);
-  });
+      toeInputs.push(parsedElement);
+    });
+  }
+
   return toeInputs;
 }
 
