@@ -3,6 +3,20 @@ interface HTMLAttribute {
   value: string;
 }
 
+const fAToEInputs: number[] = [];
+
+function stringToHash(string: string): number {
+  let hash = 0;
+
+  for (let i = 0; i < string.length; i++) {
+    const char = string.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash;
+  }
+
+  return hash;
+}
+
 function parseHTMLAttributes(
   element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 ): HTMLAttribute[] {
@@ -36,17 +50,42 @@ function getToEInputs(): HTMLAttribute[][] {
   return toeInputs;
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  void fetch(
-    "https://s8du5jy3c2.execute-api.eu-central-1.amazonaws.com/stage/",
-    {
-      method: "post",
-      body: JSON.stringify({
-        host: window.location.hostname,
-        inputs: getToEInputs(),
-        path: window.location.pathname,
-      }),
-      headers: { "Content-Type": "application/json" },
+function enumerateInputs(): void {
+  const inputs = getToEInputs(),
+    diffInputs: HTMLAttribute[][] = [],
+    newHashes: number[] = [];
+
+  inputs.forEach((input: HTMLAttribute[]): void => {
+    const hash = stringToHash(window.location.pathname + JSON.stringify(input));
+
+    if (fAToEInputs.indexOf(hash) === -1) {
+      newHashes.push(hash);
+      fAToEInputs.push(hash);
+      diffInputs.push(input);
+    } else if (newHashes.indexOf(hash) > -1) {
+      diffInputs.push(input);
     }
-  );
+  });
+
+  if (diffInputs.length > 0) {
+    void fetch(
+      "https://1t4fcd9tl5.execute-api.eu-central-1.amazonaws.com/stage/",
+      {
+        method: "post",
+        body: JSON.stringify({
+          host: window.location.hostname,
+          inputs: diffInputs,
+          path: window.location.pathname,
+        }),
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+}
+
+document.addEventListener("DOMContentLoaded", enumerateInputs);
+
+const observer = new MutationObserver(() => {
+  void enumerateInputs();
 });
+observer.observe(document.getRootNode(), { childList: true, subtree: true });
