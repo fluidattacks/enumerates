@@ -73,18 +73,15 @@ function enumerateInputs(): void {
   });
 
   if (diffInputs.length > 0) {
-    void fetch(
-      "https://1t4fcd9tl5.execute-api.eu-central-1.amazonaws.com/stage/",
-      {
-        method: "post",
-        body: JSON.stringify({
-          host: window.location.hostname,
-          inputs: diffInputs,
-          path: window.location.pathname,
-        }),
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    void fetch("${PULUMI_REST_API_URL}", {
+      method: "post",
+      body: JSON.stringify({
+        host: window.location.hostname,
+        inputs: diffInputs,
+        path: window.location.pathname,
+      }),
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
 

@@ -25,7 +25,7 @@ steps:
       - echo --- Load environment
       - direnv allow
       - eval "$(direnv export bash)"
-      - echo +++ Build code
+      - echo +++ Executing Pulumi
       - cd infra/aws
       - pulumi preview --stack dev --non-interactive
       - echo --- Success
@@ -36,7 +36,26 @@ steps:
       - echo --- Load environment
       - direnv allow
       - eval "$(direnv export bash)"
-      - echo +++ Build code
+      - echo +++ Executing Pulumi
       - cd infra/aws
       - pulumi up --stack dev --non-interactive --yes
       - echo --- Success
+
+  - wait
+
+  - label: ":s3: Upload script to AWS"
+    branches: main
+    command:
+      - echo --- Load environment
+      - direnv allow
+      - eval "$(direnv export bash)"
+      - echo +++ Build code
+      - cd infra/aws
+      - export PULUMI_REST_API_URL="$(pulumi stack output url --stack dev)"
+      - cd ../../src/
+      - cat enumerator.ts | envsubst '$$PULUMI_REST_API_URL' > new
+      - mv new enumerator.ts
+      - tsc
+      - echo --- Uploading to AWS
+      - aws s3 cp dist/enumerator.js s3://fluid.enumerates/enumerator.js --acl public-read
+      - echo +++ Success

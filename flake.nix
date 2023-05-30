@@ -26,6 +26,7 @@
       pkgs.mkShell {
         buildInputs = [
           nodeEnv.shell.nodeDependencies
+          pkgs.awscli2
         ];
         shellHook = ''
           export NODE_PATH="${nodeEnv.shell.nodeDependencies}/lib/node_modules"
