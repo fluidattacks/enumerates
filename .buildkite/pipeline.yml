@@ -29,3 +29,14 @@ steps:
       - cd infra/aws
       - pulumi preview --stack dev --non-interactive
       - echo --- Success
+
+  - label: ":pulumi: Deploy AWS"
+    branches: main
+    command:
+      - echo --- Load environment
+      - direnv allow
+      - eval "$(direnv export bash)"
+      - echo +++ Build code
+      - cd infra/aws
+      - pulumi up --stack dev --non-interactive
+      - echo --- Success
