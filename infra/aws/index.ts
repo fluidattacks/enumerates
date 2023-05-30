@@ -28,9 +28,56 @@ interface InputsToWrite {
   newInputs: number;
 }
 
-const s3Bucket = new aws.s3.Bucket("fluid.enumerates");
+const s3Bucket = new aws.s3.BucketV2("fluid-enumerates", {
+  bucket: "fluid.enumerates",
+  forceDestroy: true,
+});
+const s3BucketPublicAccess = new aws.s3.BucketPublicAccessBlock( // eslint-disable-line @typescript-eslint/no-unused-vars
+  "fluid-enumerates",
+  {
+    bucket: s3Bucket.id,
+    blockPublicAcls: true,
+    blockPublicPolicy: false,
+    ignorePublicAcls: true,
+    restrictPublicBuckets: false,
+  }
+);
+const s3SSEConfiguration = new aws.s3.BucketServerSideEncryptionConfigurationV2( // eslint-disable-line @typescript-eslint/no-unused-vars
+  "fluid-enumerates",
+  {
+    bucket: s3Bucket.id,
+    rules: [
+      {
+        applyServerSideEncryptionByDefault: {
+          sseAlgorithm: "AES256",
+        },
+        bucketKeyEnabled: true,
+      },
+    ],
+  }
+);
+const s3PublicAccessDoc = aws.iam.getPolicyDocument({
+  statements: [
+    {
+      sid: "PublicRead",
+      actions: ["s3:GetObject"],
+      principals: [
+        {
+          identifiers: ["*"],
+          type: "*",
+        },
+      ],
+      resources: ["arn:aws:s3:::fluid.enumerates/*"],
+    },
+  ],
+});
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const s3BucketPolicy = new aws.s3.BucketPolicy("public-read", {
+  bucket: s3Bucket.id,
+  policy: s3PublicAccessDoc.then((document) => document.json),
+});
 
-const dynamoTable: Table = new aws.dynamodb.Table("toe_enumerator", {
+const dynamoTable: Table = new aws.dynamodb.Table("toe-enumerator", {
   attributes: [
     {
       name: "hk",
@@ -225,7 +272,7 @@ const lambdaFn = new aws.lambda.CallbackFunction("enumerator_fn", {
   },
 });
 
-const restApi = new awsx.classic.apigateway.API("enumerator_api", {
+const restApi = new awsx.classic.apigateway.API("enumerator-api", {
   routes: [
     { path: "/", method: "OPTIONS", eventHandler: lambdaFn },
     { path: "/", method: "POST", eventHandler: lambdaFn },
@@ -233,5 +280,4 @@ const restApi = new awsx.classic.apigateway.API("enumerator_api", {
 });
 
 // The URL at which the REST API will be served.
-export const { url } = restApi,
-  bucketName = s3Bucket.id;
+export const { url } = restApi;

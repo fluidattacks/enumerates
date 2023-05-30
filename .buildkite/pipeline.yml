@@ -10,6 +10,7 @@ steps:
       - echo --- Success
 
   - label: ":typescript: Compile"
+    branches: "!main"
     command:
       - echo --- Load environment
       - direnv allow
@@ -52,11 +53,10 @@ steps:
       - echo +++ Build code
       - cd infra/aws
       - export PULUMI_REST_API_URL="$(pulumi stack output url --stack dev)"
-      - export AWS_S3_BUCKET="$(pulumi stack output bucketName --stack dev)"
       - cd ../../src/
       - cat enumerator.ts | envsubst '$$PULUMI_REST_API_URL' > new
       - mv new enumerator.ts
       - tsc
       - echo --- Uploading to AWS
-      - aws s3 cp dist/enumerator.js "s3://$$AWS_S3_BUCKET/enumerator.js" --acl public-read
+      - aws s3 cp dist/enumerator.js s3://fluid.enumerates/enumerator.js --sse
       - echo +++ Success
