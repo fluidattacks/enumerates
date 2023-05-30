@@ -28,6 +28,8 @@ interface InputsToWrite {
   newInputs: number;
 }
 
+const s3Bucket = new aws.s3.Bucket("fluid.enumerates", { acl: "public-read" });
+
 const dynamoTable: Table = new aws.dynamodb.Table("toe_enumerator", {
   attributes: [
     {
@@ -231,4 +233,5 @@ const restApi = new awsx.classic.apigateway.API("enumerator_api", {
 });
 
 // The URL at which the REST API will be served.
-export const { url } = restApi;
+export const { url } = restApi,
+  bucketName = s3Bucket.id;
