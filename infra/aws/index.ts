@@ -28,7 +28,7 @@ interface InputsToWrite {
   newInputs: number;
 }
 
-const s3Bucket = new aws.s3.Bucket("fluid.enumerates", { acl: "public-read" });
+const s3Bucket = new aws.s3.Bucket("fluid.enumerates");
 
 const dynamoTable: Table = new aws.dynamodb.Table("toe_enumerator", {
   attributes: [
