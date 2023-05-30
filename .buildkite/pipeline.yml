@@ -38,5 +38,5 @@ steps:
       - eval "$(direnv export bash)"
       - echo +++ Build code
       - cd infra/aws
-      - pulumi up --stack dev --non-interactive
+      - pulumi up --stack dev --non-interactive --yes
       - echo --- Success
