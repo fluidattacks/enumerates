@@ -32,6 +32,18 @@ const s3Bucket = new aws.s3.BucketV2("fluid-enumerates", {
   bucket: "fluid.enumerates",
   forceDestroy: true,
 });
+const s3CORSConfiguration = new aws.s3.BucketCorsConfigurationV2( // eslint-disable-line @typescript-eslint/no-unused-vars
+  "fluid.enumerates",
+  {
+    bucket: s3Bucket.id,
+    corsRules: [
+      {
+        allowedMethods: ["GET"],
+        allowedOrigins: ["*"],
+      },
+    ],
+  }
+);
 const s3BucketPublicAccess = new aws.s3.BucketPublicAccessBlock( // eslint-disable-line @typescript-eslint/no-unused-vars
   "fluid-enumerates",
   {
