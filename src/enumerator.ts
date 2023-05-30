@@ -25,7 +25,12 @@ function parseHTMLAttributes(
   ];
   for (let i = 0; i < element.attributes.length; i++) {
     const attr = element.attributes[i];
-    parsedAttributes.push({ name: attr.name.toLowerCase(), value: attr.value });
+    if (attr.name.toLowerCase() !== "class") {
+      parsedAttributes.push({
+        name: attr.name.toLowerCase(),
+        value: attr.value,
+      });
+    }
   }
   return parsedAttributes;
 }

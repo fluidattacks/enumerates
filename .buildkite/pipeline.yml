@@ -8,3 +8,13 @@ steps:
       - echo +++ Run Linter
       - eslint .
       - echo --- Success
+
+  - label: build
+    command:
+      - echo --- Load environment
+      - direnv allow
+      - eval "$(direnv export bash)"
+      - echo +++ Build code
+      - cd src/
+      - tsc
+      - echo --- Success
