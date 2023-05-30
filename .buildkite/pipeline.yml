@@ -1,6 +1,6 @@
 steps:
-  - label: lint
-    if: build.branch != "main"
+  - label: ":lint-roller: Linter"
+    branches: "!main"
     command:
       - echo --- Load environment
       - direnv allow
@@ -9,7 +9,7 @@ steps:
       - eslint .
       - echo --- Success
 
-  - label: build
+  - label: ":typescript: Compile"
     command:
       - echo --- Load environment
       - direnv allow
@@ -17,4 +17,15 @@ steps:
       - echo +++ Build code
       - cd src/
       - tsc
+      - echo --- Success
+
+  - label: ":pulumi: Preview AWS"
+    branches: "!main"
+    command:
+      - echo --- Load environment
+      - direnv allow
+      - eval "$(direnv export bash)"
+      - echo +++ Build code
+      - cd infra/aws
+      - pulumi preview --stack dev --non-interactive
       - echo --- Success
