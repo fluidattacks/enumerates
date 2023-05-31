@@ -292,4 +292,5 @@ const restApi = new awsx.classic.apigateway.API("enumerator-api", {
 });
 
 // The URL at which the REST API will be served.
-export const { url } = restApi;
+export const { url } = restApi,
+  s3BucketName = s3Bucket.id;
