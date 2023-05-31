@@ -1,6 +1,6 @@
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
-import * as pulumi from "@pulumi/pulumi"; // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as pulumi from "@pulumi/pulumi";
 import * as CryptoJS from "crypto-js";
 import type { APIGatewayProxyEvent } from "aws-lambda";
 import type { DocumentClient } from "aws-sdk/lib/dynamodb/document_client";
@@ -68,7 +68,7 @@ const s3SSEConfiguration = new aws.s3.BucketServerSideEncryptionConfigurationV2(
     ],
   }
 );
-const s3PublicAccessDoc = aws.iam.getPolicyDocument({
+const s3PublicAccessDoc = aws.iam.getPolicyDocumentOutput({
   statements: [
     {
       sid: "PublicRead",
@@ -79,14 +79,14 @@ const s3PublicAccessDoc = aws.iam.getPolicyDocument({
           type: "*",
         },
       ],
-      resources: ["arn:aws:s3:::fluid.enumerates/*"],
+      resources: [pulumi.interpolate`${s3Bucket.arn}/*`],
     },
   ],
 });
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const s3BucketPolicy = new aws.s3.BucketPolicy("public-read", {
   bucket: s3Bucket.id,
-  policy: s3PublicAccessDoc.then((document) => document.json),
+  policy: s3PublicAccessDoc.apply((document) => document.json),
 });
 
 const dynamoTable: Table = new aws.dynamodb.Table("toe-enumerator", {
