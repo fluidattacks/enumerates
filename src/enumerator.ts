@@ -17,9 +17,7 @@ function stringToHash(string: string): number {
   return hash;
 }
 
-function parseHTMLAttributes(
-  element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-): HTMLAttribute[] {
+function parseHTMLAttributes(element: HTMLElement): HTMLAttribute[] {
   const parsedAttributes: HTMLAttribute[] = [
     { name: "tagname", value: element.tagName },
   ];
@@ -36,20 +34,25 @@ function parseHTMLAttributes(
 }
 
 function getToEInputs(): HTMLAttribute[][] {
-  const inputs: NodeListOf<HTMLInputElement> =
-      document.querySelectorAll("input"),
-    textareas: NodeListOf<HTMLTextAreaElement> =
-      document.querySelectorAll("textarea"),
-    selects: NodeListOf<HTMLSelectElement> =
-      document.querySelectorAll("select"),
-    toeInputs: HTMLAttribute[][] = [];
+  const toeInputs: HTMLAttribute[][] = [];
 
-  for (const htmlElements of [inputs, textareas, selects]) {
-    htmlElements.forEach((htmlElement) => {
-      const parsedElement = parseHTMLAttributes(htmlElement);
+  for (const elementType of ["input", "select", "textarea"]) {
+    const elements = document.evaluate(
+      `//form//${elementType}`,
+      document,
+      null,
+      XPathResult.ORDERED_NODE_ITERATOR_TYPE,
+      null
+    );
 
-      toeInputs.push(parsedElement);
-    });
+    let element = elements.iterateNext();
+    while (element) {
+      if (element.nodeType === Node.ELEMENT_NODE) {
+        const parsedElement = parseHTMLAttributes(element as HTMLElement);
+        toeInputs.push(parsedElement);
+      }
+      element = elements.iterateNext();
+    }
   }
 
   return toeInputs;
