@@ -29,11 +29,10 @@ interface InputsToWrite {
 }
 
 const s3Bucket = new aws.s3.BucketV2("fluid-enumerates", {
-  bucket: "fluid.enumerates",
   forceDestroy: true,
 });
 const s3CORSConfiguration = new aws.s3.BucketCorsConfigurationV2( // eslint-disable-line @typescript-eslint/no-unused-vars
-  "fluid.enumerates",
+  "fluid-enumerates",
   {
     bucket: s3Bucket.id,
     corsRules: [
@@ -214,7 +213,7 @@ const processInputs = (
   return { inputs: writeRequests, newInputs };
 };
 
-const lambdaFn = new aws.lambda.CallbackFunction("enumerator_fn", {
+const lambdaFn = new aws.lambda.CallbackFunction("enumerator-fn", {
   callbackFactory: () => {
     let dynamoClient = new aws.sdk.DynamoDB.DocumentClient();
 
