@@ -1,6 +1,6 @@
 steps:
-  - label: ":pipeline: Upload Pipeline Spec"
-    command: .buildkite/pipeline.sh | buildkite-agent pipeline upload
+  - label: ":pipeline: Upload Dynamic Steps"
+    command: .buildkite/pipeline.sh
 
   - label: ":lint-roller: Linter"
     branches: "!main"
