@@ -58,7 +58,7 @@ function getToEInputs(): HTMLAttribute[][] {
   return toeInputs;
 }
 
-function enumerateInputs(): void {
+export function enumerateInputs(): void {
   const inputs = getToEInputs(),
     diffInputs: HTMLAttribute[][] = [],
     newHashes: number[] = [];

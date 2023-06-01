@@ -20,6 +20,16 @@ steps:
       - tsc
       - echo --- Success
 
+  - label: ":jest: Test Enumerator"
+    branches: "!main"
+    command:
+      - echo --- Load environment
+      - direnv allow
+      - eval "$(direnv export bash)"
+      - echo +++ Build code
+      - jest
+      - echo --- Success
+
   - label: ":pulumi: Preview AWS"
     branches: "!main"
     command:
