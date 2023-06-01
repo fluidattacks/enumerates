@@ -1,4 +1,7 @@
 steps:
+  - label: ":pipeline: Upload Pipeline Spec"
+    command: .buildkite/pipeline.sh | buildkite-agent pipeline upload
+
   - label: ":lint-roller: Linter"
     branches: "!main"
     command:
@@ -42,6 +45,7 @@ steps:
       - echo --- Success
 
   - label: ":pulumi: Deploy AWS"
+    key: deploy_pulumi
     branches: main
     command:
       - echo --- Load environment
@@ -51,23 +55,3 @@ steps:
       - cd infra/aws
       - pulumi up --stack dev --non-interactive --yes
       - echo --- Success
-
-  - wait
-
-  - label: ":s3: Upload script to AWS"
-    branches: main
-    command:
-      - echo --- Load environment
-      - direnv allow
-      - eval "$(direnv export bash)"
-      - echo +++ Build code
-      - cd infra/aws
-      - export PULUMI_REST_API_URL="$(pulumi stack output url --stack dev)"
-      - export S3_BUCKET="$(pulumi stack output s3BucketName --stack dev)"
-      - cd ../../src/
-      - cat enumerator.ts | envsubst '$$PULUMI_REST_API_URL' > new
-      - mv new enumerator.ts
-      - tsc
-      - echo --- Uploading to AWS
-      - aws s3 cp dist/enumerator.js "s3://$$S3_BUCKET/enumerator.js" --sse
-      - echo +++ Success
