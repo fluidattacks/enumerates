@@ -1,0 +1,12 @@
+{
+  "moduleFileExtensions": [
+    "ts",
+    "js"
+  ],
+  "randomize": true,
+  "testEnvironment": "jsdom",
+  "testRegex": "tests/.*\\.test\\.ts$",
+  "transform": {
+    "^.+\\.ts$": "ts-jest"
+  }
+}
