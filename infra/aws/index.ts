@@ -181,6 +181,7 @@ const processInputs = (
 
     item["hk"] = `HOST#${host}#PATH#${path}`;
     item["rk"] = `TAG#${item["tagname"]}#IDENTIFIER#${identifier}#HASH#${hash}`;
+    item["host"] = `HOST#${host}`;
     item["first_seen"] = item["last_seen"] = new Date().toISOString();
 
     if (inputExistsInDb) {
