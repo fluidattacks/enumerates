@@ -98,6 +98,10 @@ const dynamoTable: Table = new aws.dynamodb.Table("toe-enumerator", {
       name: "rk",
       type: "S",
     },
+    {
+      name: "host",
+      type: "S",
+    },
   ],
   billingMode: "PROVISIONED",
   globalSecondaryIndexes: [
@@ -106,6 +110,14 @@ const dynamoTable: Table = new aws.dynamodb.Table("toe-enumerator", {
       name: "gsi-1",
       projectionType: "ALL",
       rangeKey: "rk",
+      readCapacity: 10,
+      writeCapacity: 10,
+    },
+    {
+      hashKey: "host",
+      name: "gsi-host",
+      projectionType: "ALL",
+      rangeKey: "hk",
       readCapacity: 10,
       writeCapacity: 10,
     },
