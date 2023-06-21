@@ -22,6 +22,9 @@ describe("Testing enumerator functions", () => {
       "    </div>" +
       "  </form>" +
       '  <input name="input2" type="checkbox">' +
+      // "  <custom-form>" +
+      // '      <input name="input3" type="text">' +
+      // "  </custom-form>" +
       "</div>";
 
     const expected_request_body = {
@@ -32,6 +35,11 @@ describe("Testing enumerator functions", () => {
           { name: "name", value: "input1" },
           { name: "type", value: "text" },
           { name: "value", value: "" },
+        ],
+        [
+          { name: "tagname", value: "INPUT" },
+          { name: "name", value: "input3" },
+          { name: "type", value: "text" },
         ],
         [
           { name: "tagname", value: "SELECT" },
