@@ -38,7 +38,7 @@ function getToEInputs(): HTMLAttribute[][] {
 
   for (const elementType of ["input", "select", "textarea"]) {
     const elements = document.evaluate(
-      `//form//${elementType}`,
+      `//*[contains(local-name(), 'form')]//${elementType}`,
       document,
       null,
       XPathResult.ORDERED_NODE_ITERATOR_TYPE,
