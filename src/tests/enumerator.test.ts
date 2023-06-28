@@ -14,7 +14,7 @@ describe("Testing enumerator functions", () => {
       "    </div>" +
       "    <div>" +
       "      <div>" +
-      '        <select name="select1">' +
+      '        <select id="select1" name="select1">' +
       '          <option value="value1">Option 1</option>' +
       '          <option value="value2">Option 2</option>' +
       "        </select>" +
@@ -37,21 +37,28 @@ describe("Testing enumerator functions", () => {
         cookies: ["cookie1", "cookie2", "cookie3"],
         forms: [
           [
-            { name: "tagname", value: "input" },
             { name: "class", value: "class1" },
             { name: "name", value: "input1" },
+            { name: "tagname", value: "input" },
             { name: "type", value: "text" },
             { name: "value", value: "" },
+            { name: "xpath", value: "/html/body[1]/div/form[1]/input[1]" },
           ],
           [
-            { name: "tagname", value: "select" },
+            { name: "id", value: "select1" },
             { name: "name", value: "select1" },
+            { name: "tagname", value: "select" },
+            { name: "xpath", value: "//*[@id='select1']" },
           ],
           [
-            { name: "tagname", value: "textarea" },
             { name: "name", value: "textarea1" },
-            { name: "type", value: "text" },
             { name: "rows", value: "6" },
+            { name: "tagname", value: "textarea" },
+            { name: "type", value: "text" },
+            {
+              name: "xpath",
+              value: "/html/body[1]/div/form[1]/div[1]/textarea",
+            },
           ],
         ],
       },
