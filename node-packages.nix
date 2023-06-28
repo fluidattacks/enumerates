@@ -1062,15 +1062,6 @@
         sha512 = "TBOjqAGf0hmaqRwpii5LLkJLg7c6OMm4nHLmpsUxwk9bBHtoTC6dAHdVWdGv4TBxj2CZOZY8Xfq8WmfoVi7n4Q==";
       };
     };
-    "@types/crypto-js-4.1.1" = {
-      name = "_at_types_slash_crypto-js";
-      packageName = "@types/crypto-js";
-      version = "4.1.1";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/@types/crypto-js/-/crypto-js-4.1.1.tgz";
-        sha512 = "BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==";
-      };
-    };
     "@types/graceful-fs-4.1.6" = {
       name = "_at_types_slash_graceful-fs";
       packageName = "@types/graceful-fs";
@@ -1861,15 +1852,6 @@
       src = fetchurl {
         url = "https://registry.npmjs.org/cross-spawn/-/cross-spawn-7.0.3.tgz";
         sha512 = "iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==";
-      };
-    };
-    "crypto-js-4.1.1" = {
-      name = "crypto-js";
-      packageName = "crypto-js";
-      version = "4.1.1";
-      src = fetchurl {
-        url = "https://registry.npmjs.org/crypto-js/-/crypto-js-4.1.1.tgz";
-        sha512 = "o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==";
       };
     };
     "cssom-0.3.8" = {
@@ -5603,7 +5585,6 @@
       sources."@types/babel__generator-7.6.4"
       sources."@types/babel__template-7.4.1"
       sources."@types/babel__traverse-7.20.0"
-      sources."@types/crypto-js-4.1.1"
       sources."@types/graceful-fs-4.1.6"
       sources."@types/istanbul-lib-coverage-2.0.4"
       sources."@types/istanbul-lib-report-3.0.0"
@@ -5709,7 +5690,6 @@
       sources."create-require-1.1.1"
       sources."cross-fetch-3.1.6"
       sources."cross-spawn-7.0.3"
-      sources."crypto-js-4.1.1"
       sources."cssom-0.5.0"
       (sources."cssstyle-2.3.0"
         // {

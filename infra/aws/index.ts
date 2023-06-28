@@ -1,7 +1,6 @@
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 import * as pulumi from "@pulumi/pulumi";
-import * as CryptoJS from "crypto-js";
 import type { APIGatewayProxyEvent } from "aws-lambda";
 import type { DocumentClient } from "aws-sdk/lib/dynamodb/document_client";
 import type { Table } from "@pulumi/aws/dynamodb";
@@ -11,10 +10,25 @@ interface HTMLAttribute {
   value: string;
 }
 
-interface Payload {
+interface Location {
+  hash: string;
   host: string;
-  inputs: HTMLAttribute[][];
   path: string;
+}
+
+interface DBToEInputs {
+  cookies: Record<string, string>[];
+  forms: Record<string, string>[];
+}
+
+interface RequestToEInputs {
+  cookies: string[];
+  forms: HTMLAttribute[][];
+}
+
+interface RequestBody {
+  inputs: RequestToEInputs;
+  location: Location;
 }
 
 interface LambdaResponse {
@@ -107,9 +121,17 @@ const dynamoTable: Table = new aws.dynamodb.Table("toe-enumerator", {
   globalSecondaryIndexes: [
     {
       hashKey: "hk",
-      name: "gsi-1",
+      name: "gsi-main",
       projectionType: "ALL",
       rangeKey: "rk",
+      readCapacity: 10,
+      writeCapacity: 10,
+    },
+    {
+      hashKey: "rk",
+      name: "gsi-inverted",
+      projectionType: "ALL",
+      rangeKey: "hk",
       readCapacity: 10,
       writeCapacity: 10,
     },
@@ -130,98 +152,99 @@ const dynamoTable: Table = new aws.dynamodb.Table("toe-enumerator", {
 
 const fetchExistingInputs = async (
   dynamoClient: DocumentClient,
-  host: string,
-  path: string
-): Promise<Record<string, string>[]> => {
-  const hk = `HOST#${host}#PATH#${path}`;
-
-  const response = await dynamoClient
+  location: Location
+): Promise<DBToEInputs> => {
+  const tableName = dynamoTable.name.get();
+  const formInputs = await dynamoClient
     .query({
-      TableName: dynamoTable.name.get(),
-      IndexName: "gsi-1",
+      TableName: tableName,
+      IndexName: "gsi-main",
       KeyConditionExpression: "hk = :hk and begins_with(rk, :rk)",
-      ExpressionAttributeValues: { ":hk": hk, ":rk": "TAG" },
+      ExpressionAttributeValues: {
+        ":hk": `HOST#${location.host}#PATH#${location.path}#HASH#${location.path}`,
+        ":rk": "XPATH",
+      },
     })
     .promise()
     .then((queryResult) => queryResult.$response);
 
-  return response.data && response.data.Items ? response.data.Items : [];
+  const cookieInputs = await dynamoClient
+    .query({
+      TableName: tableName,
+      IndexName: "gsi-main",
+      KeyConditionExpression: "hk = :hk and begins_with(rk, :rk)",
+      ExpressionAttributeValues: {
+        ":hk": `HOST#${location.host}`,
+        ":rk": "COOKIE",
+      },
+    })
+    .promise()
+    .then((queryResult) => queryResult.$response);
+
+  return {
+    cookies:
+      cookieInputs.data && cookieInputs.data.Items
+        ? cookieInputs.data.Items
+        : [],
+    forms:
+      formInputs.data && formInputs.data.Items ? formInputs.data.Items : [],
+  };
 };
 
 const processInputs = (
-  inputs: HTMLAttribute[][],
-  existingInputs: Record<string, string>[],
-  host: string,
-  path: string
+  inputs: RequestToEInputs,
+  existingInputs: DBToEInputs,
+  location: Location
 ): InputsToWrite => {
-  const existingIdentifiersInDb: string[] = existingInputs.map(
-      (input: Record<string, string>): string => {
-        const splitRk = input["rk"].split("#");
-
-        return input["duplicate_index"] === undefined ? splitRk[3] : splitRk[5];
-      }
-    ),
-    duplicateIdentifiers: Record<string, number> = {},
-    writeRequests: DocumentClient.WriteRequests = [];
-
+  const writeRequests: DocumentClient.WriteRequests = [];
   let newInputs = 0;
 
-  inputs.forEach((input: HTMLAttribute[]) => {
-    const item: Record<string, string> = {};
+  let inputType: keyof typeof existingInputs;
+  for (inputType in existingInputs) {
+    const inputsInDb: string[] = existingInputs[inputType].map(
+      (item: Record<string, string>): string => item["rk"].split("#")[1]
+    );
 
-    input.forEach((attribute: HTMLAttribute) => {
-      item[attribute.name] = attribute.value;
-    });
+    inputs[inputType].forEach((input: string | HTMLAttribute[]) => {
+      const item: Record<string, string> = {};
+      let identifier: string;
 
-    const identifier: string =
-      item["id"] || item["name"] || item["placeholder"] || "undefined";
+      if (typeof input === "string") {
+        item["hk"] = `HOST#${location.host}`;
+        item["rk"] = `COOKIE#${input}`;
 
-    if (duplicateIdentifiers[identifier] === undefined) {
-      duplicateIdentifiers[identifier] = 0;
-    } else {
-      item["duplicate_index"] = duplicateIdentifiers[identifier].toString();
-      duplicateIdentifiers[identifier]++;
-    }
+        identifier = input;
+      } else {
+        input.forEach((attribute: HTMLAttribute) => {
+          item[attribute.name] = attribute.value;
+        });
 
-    const hash = CryptoJS.SHA256(JSON.stringify(item)).toString(
-        CryptoJS.enc.Hex
-      ),
-      inputExistsInDb: boolean =
-        item["duplicate_index"] === undefined
-          ? existingIdentifiersInDb.indexOf(identifier) > -1
-          : existingIdentifiersInDb.indexOf(hash) > -1;
+        item[
+          "hk"
+        ] = `HOST#${location.host}#PATH#${location.path}#HASH#${location.hash}`;
+        item["rk"] = `XPATH#${item["xpath"]}`;
 
-    item["hk"] = `HOST#${host}#PATH#${path}`;
-    item["rk"] = `TAG#${item["tagname"]}#IDENTIFIER#${identifier}#HASH#${hash}`;
-    item["host"] = `HOST#${host}`;
-    item["first_seen"] = item["last_seen"] = new Date().toISOString();
+        identifier = item["xpath"];
+      }
 
-    if (inputExistsInDb) {
-      writeRequests.push({
-        PutRequest: {
-          Item:
-            item["duplicate_index"] === undefined
-              ? {
-                  ...existingInputs[
-                    existingIdentifiersInDb.indexOf(identifier)
-                  ],
-                  last_seen: item["last_seen"],
-                }
-              : {
-                  ...existingInputs[existingIdentifiersInDb.indexOf(hash)],
-                  last_seen: item["last_seen"],
-                },
-        },
-      });
-    } else {
-      newInputs++;
+      item["host"] = `HOST#${location.host}`;
+      item["first_seen"] = item["last_seen"] = new Date().toISOString();
+      if (inputsInDb.indexOf(identifier) > -1) {
+        item["first_seen"] =
+          existingInputs[inputType][inputsInDb.indexOf(identifier)][
+            "first_seen"
+          ];
+      } else {
+        newInputs++;
+      }
+
       writeRequests.push({
         PutRequest: {
           Item: item,
         },
       });
-    }
-  });
+    });
+  }
 
   return { inputs: writeRequests, newInputs };
 };
@@ -253,19 +276,19 @@ const lambdaFn = new aws.lambda.CallbackFunction("enumerator-fn", {
             body = Buffer.from(body, "base64").toString("binary");
           }
 
-          const parsedBody = JSON.parse(body) as Payload,
-            { host, inputs, path } = parsedBody;
+          const { inputs, location } = JSON.parse(body) as RequestBody;
+          // # is used as a delimiter in the DB, so replace it in the hash
+          location.hash = location.hash.replace("#", "{anchor}");
 
           if (!dynamoClient) {
             dynamoClient = new aws.sdk.DynamoDB.DocumentClient();
           }
 
           const existingInputs = await fetchExistingInputs(
-              dynamoClient,
-              host,
-              path
-            ),
-            parsedInputs = processInputs(inputs, existingInputs, host, path);
+            dynamoClient,
+            location
+          );
+          const parsedInputs = processInputs(inputs, existingInputs, location);
 
           if (parsedInputs.inputs.length > 0) {
             await dynamoClient
