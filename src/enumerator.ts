@@ -3,89 +3,85 @@ interface HTMLAttribute {
   value: string;
 }
 
-const fAToEInputs: number[] = [];
+// Global variable used in SPAs to keep track of enumerated inputs
+// and avoid doing unnecessary calls to the enumerator API
+// const fAToEInputs: number[] = [];
 
-function stringToHash(string: string): number {
-  let hash = 0;
+// function stringToHash(string: string): number {
+//   let hash = 0;
 
-  for (let i = 0; i < string.length; i++) {
-    const char = string.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
+//   for (let i = 0; i < string.length; i++) {
+//     const char = string.charCodeAt(i);
+//     hash = (hash << 5) - hash + char;
+//     hash = hash & hash;
+//   }
 
-  return hash;
-}
+//   return hash;
+// }
 
-function parseHTMLAttributes(element: HTMLElement): HTMLAttribute[] {
+function parseHTMLAttributes(element: Element): HTMLAttribute[] {
   const parsedAttributes: HTMLAttribute[] = [
-    { name: "tagname", value: element.tagName },
+    { name: "tagname", value: element.tagName.toLowerCase() },
   ];
+
   for (let i = 0; i < element.attributes.length; i++) {
     const attr = element.attributes[i];
-    if (attr.name.toLowerCase() !== "class") {
-      parsedAttributes.push({
-        name: attr.name.toLowerCase(),
-        value: attr.value,
-      });
-    }
+    parsedAttributes.push({
+      name: attr.name.toLowerCase(),
+      value: attr.value,
+    });
   }
   return parsedAttributes;
 }
 
-function getToEInputs(): HTMLAttribute[][] {
+function getFormInputs(): HTMLAttribute[][] {
   const toeInputs: HTMLAttribute[][] = [];
 
   for (const elementType of ["input", "select", "textarea"]) {
-    const elements = document.evaluate(
-      `//*[contains(local-name(), 'form')]//${elementType}`,
-      document,
-      null,
-      XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-      null
-    );
+    const elements = document.querySelectorAll(`form ${elementType}`);
 
-    let element = elements.iterateNext();
-    while (element) {
-      if (element.nodeType === Node.ELEMENT_NODE) {
-        const parsedElement = parseHTMLAttributes(element as HTMLElement);
-        toeInputs.push(parsedElement);
-      }
-      element = elements.iterateNext();
+    for (const element of elements) {
+      const parsedElement = parseHTMLAttributes(element);
+      toeInputs.push(parsedElement);
     }
   }
 
   return toeInputs;
 }
 
-export function enumerateInputs(): void {
-  const inputs = getToEInputs(),
-    diffInputs: HTMLAttribute[][] = [],
-    newHashes: number[] = [];
+function getCookieInputs(): string[] {
+  const cookieInputs: string[] = [];
+  const cookies = document.cookie;
 
-  inputs.forEach((input: HTMLAttribute[]): void => {
-    const hash = stringToHash(window.location.pathname + JSON.stringify(input));
-
-    if (fAToEInputs.indexOf(hash) === -1) {
-      newHashes.push(hash);
-      fAToEInputs.push(hash);
-      diffInputs.push(input);
-    } else if (newHashes.indexOf(hash) > -1) {
-      diffInputs.push(input);
+  if (cookies.length > 0) {
+    const cookieList = cookies.split(";");
+    for (const cookie of cookieList) {
+      cookieInputs.push(cookie.split("=")[0].trim());
     }
-  });
-
-  if (diffInputs.length > 0) {
-    void fetch("${PULUMI_REST_API_URL}", {
-      method: "post",
-      body: JSON.stringify({
-        host: window.location.hostname,
-        inputs: diffInputs,
-        path: window.location.pathname,
-      }),
-      headers: { "Content-Type": "application/json" },
-    });
   }
+
+  return cookieInputs;
+}
+
+export function enumerateInputs(): void {
+  const formInputs = getFormInputs();
+  const cookieInputs = getCookieInputs();
+
+  void fetch("${PULUMI_REST_API_URL}", {
+    method: "post",
+    body: JSON.stringify({
+      location: {
+        hash: document.location.hash,
+        host: document.location.hostname,
+        path: document.location.pathname,
+      },
+      inputs: {
+        cookies: cookieInputs,
+        forms: formInputs,
+      },
+    }),
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 document.addEventListener("DOMContentLoaded", enumerateInputs);

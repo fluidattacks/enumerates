@@ -32,8 +32,6 @@ steps:
       - echo +++ Build code
       - jest
       - echo --- Success
-    soft_fail:
-      - exit_status: 1
 
   - label: ":pulumi: Preview AWS"
     branches: "!main"
