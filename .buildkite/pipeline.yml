@@ -1,7 +1,4 @@
 steps:
-  - label: ":pipeline: Upload Dynamic Steps"
-    command: .buildkite/pipeline.sh
-
   - label: ":lint-roller: Linter"
     branches: "!main"
     command:
@@ -55,3 +52,23 @@ steps:
       - cd infra/aws
       - pulumi up --stack dev --non-interactive --yes
       - echo --- Success
+
+  - label: ":s3: Upload script to AWS"
+    branches: main
+    command:
+      - echo --- Load environment
+      - direnv allow
+      - eval "$(direnv export bash)"
+      - echo +++ Build code
+      - cd infra/aws
+      - export PULUMI_REST_API_URL="$(pulumi stack output url --stack dev)"
+      - export S3_BUCKET="$(pulumi stack output s3BucketName --stack dev)"
+      - cd ../../src/
+      - cat enumerator.ts | envsubst '$$PULUMI_REST_API_URL' > new
+      - mv new enumerator.ts
+      - tsc
+      - echo --- Uploading to AWS
+      - aws s3 cp dist/enumerator.js "s3://$$S3_BUCKET/enumerator.js" --sse
+      - echo +++ Success
+    depends_on:
+      - deploy_pulumi
