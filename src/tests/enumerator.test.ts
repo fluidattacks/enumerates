@@ -22,37 +22,39 @@ describe("Testing enumerator functions", () => {
       "    </div>" +
       "  </form>" +
       '  <input name="input2" type="checkbox">' +
-      // "  <custom-form>" +
-      // '      <input name="input3" type="text">' +
-      // "  </custom-form>" +
       "</div>";
+    document.cookie = "cookie1=value1";
+    document.cookie = "cookie2=value2";
+    document.cookie = "cookie3=value3";
 
     const expected_request_body = {
-      host: "localhost",
-      inputs: [
-        [
-          { name: "tagname", value: "INPUT" },
-          { name: "name", value: "input1" },
-          { name: "type", value: "text" },
-          { name: "value", value: "" },
+      location: {
+        hash: "",
+        host: "localhost",
+        path: "/",
+      },
+      inputs: {
+        cookies: ["cookie1", "cookie2", "cookie3"],
+        forms: [
+          [
+            { name: "tagname", value: "input" },
+            { name: "class", value: "class1" },
+            { name: "name", value: "input1" },
+            { name: "type", value: "text" },
+            { name: "value", value: "" },
+          ],
+          [
+            { name: "tagname", value: "select" },
+            { name: "name", value: "select1" },
+          ],
+          [
+            { name: "tagname", value: "textarea" },
+            { name: "name", value: "textarea1" },
+            { name: "type", value: "text" },
+            { name: "rows", value: "6" },
+          ],
         ],
-        [
-          { name: "tagname", value: "INPUT" },
-          { name: "name", value: "input3" },
-          { name: "type", value: "text" },
-        ],
-        [
-          { name: "tagname", value: "SELECT" },
-          { name: "name", value: "select1" },
-        ],
-        [
-          { name: "tagname", value: "TEXTAREA" },
-          { name: "name", value: "textarea1" },
-          { name: "type", value: "text" },
-          { name: "rows", value: "6" },
-        ],
-      ],
-      path: "/",
+      },
     };
 
     enumerateInputs();
